@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Car Racing Game</title>
+  <style>
+    #game {
+      position: relative;
+      width: 500px;
+      height: 500px;
+      border: 1px solid black;
+      overflow: hidden;
+    }
+
+    #car {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 100px;
+      background-color: red;
+    }
+
+    .obstacle {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: blue;
+    }
+  </style>
+</head>
+<body>
+  <h1>Car Racing Game</h1>
+  <div id="game">
+    <div id="car"></div>
+  </div>
+
+  <script>
+    var car = document.getElementById('car');
+    var game = document.getElementById('game');
+    var obstacleInterval;
+
+    function moveCar(event) {
+      if (event.keyCode === 37) {
+        // Move left (Arrow Left key)
+        var left = parseInt(window.getComputedStyle(car).getPropertyValue('left'));
+        if (left > 0) {
+          car.style.left = left - 10 + 'px';
+        }
+      } else if (event.keyCode === 39) {
+        // Move right (Arrow Right key)
+        var left = parseInt(window.getComputedStyle(car).getPropertyValue('left'));
+        if (left < game.offsetWidth - car.offsetWidth) {
+          car.style.left = left + 10 + 'px';
+        }
+      }
+    }
+
+    function createObstacle() {
+      var obstacle = document.createElement('div');
+      obstacle.className = 'obstacle';
+      obstacle.style.left = Math.random() * (game.offsetWidth - 50) + 'px';
+      game.appendChild(obstacle);
+
+      var animationInterval = setInterval(function() {
+        var obstacleTop = obstacle.offsetTop;
+        obstacle.style.top = obstacleTop + 10 + 'px';
+
+        if (obstacleTop > game.offsetHeight) {
+          clearInterval(animationInterval);
+          game.removeChild(obstacle);
+        }
+
+        var carLeft = parseInt(window.getComputedStyle(car).getPropertyValue('left'));
+        var obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue('left'));
+        var obstacleWidth = obstacle.offsetWidth;
+        var carWidth = car.offsetWidth;
+
+        if (
+          obstacleTop > game.offsetHeight - car.offsetHeight - 10 &&
+          obstacleTop < game.offsetHeight - car.offsetHeight + 10 &&
+          carLeft + carWidth / 2 > obstacleLeft &&
+          carLeft + carWidth / 2 < obstacleLeft + obstacleWidth
+        ) {
+          clearInterval(obstacleInterval);
+          clearInterval(animationInterval);
+          alert('Game Over!');
+          location.reload();
+        }
+      }, 20);
+    }
+
+    document.addEventListener('keydown', moveCar);
+    obstacleInterval = setInterval(createObstacle, 2000);
+  </script>
+</body>
+</html>
